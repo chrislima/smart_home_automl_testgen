@@ -52,18 +52,24 @@ preds = aml.leader.predict(test_h2o)
 pred_df = preds.as_data_frame()
 original_test = test.reset_index(drop=True)
 original_test['predicted_failure_prob'] = pred_df['p1']
-risky_cases = original_test[original_test['predicted_failure_prob'] > 0.85]
+risky_cases = original_test[original_test['predicted_failure_prob'] > 0.1]
 
 if risky_cases.empty:
-    print("Nenhum cenário de alto risco encontrado. Gerando teste simbólico...")
+    print("No high risk scenario found!")
     risky_cases = original_test.sort_values(by='predicted_failure_prob', ascending=False).head(1)
 
 # Save test functions
 with open("generated_tests.py", "w") as f:
     for idx, row in risky_cases.iterrows():
+        command_cols = row.filter(like='command_').fillna(0).astype(float)
+
+        if command_cols.sum() == 0:
+            command_name = "unknown_command"
+        else:
+            command_name = command_cols.idxmax().replace('command_', '')
+
         f.write(f"def test_generated_case_{idx}():\n")
         f.write(f"    # Predicted failure probability: {row['predicted_failure_prob']:.2f}\n")
-        command = row.filter(like='command_').idxmax()[8:]
-        f.write(f"    send_command('{command}')\n")
+        f.write(f"    send_command('{command_name}')\n")
         f.write(f"    simulate_network_latency({int(row['latency_ms'])})\n")
         f.write(f"    assert_device_sync(timeout=3000)\n\n")
