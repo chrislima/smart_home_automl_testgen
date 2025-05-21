@@ -36,9 +36,10 @@ Dependencies include:
 - pandas
 - numpy
 - scikit-learn
-
+```
 > Note: The first time H2O runs, it may take a few seconds to initialize the local cluster.
-
+> Note2: Please make sure you are running JDK 64bits.
+```
 ## ▶️ How to Run
 
 Simply execute the main script:
