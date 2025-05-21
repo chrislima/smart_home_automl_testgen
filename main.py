@@ -52,7 +52,7 @@ preds = aml.leader.predict(test_h2o)
 pred_df = preds.as_data_frame()
 original_test = test.reset_index(drop=True)
 original_test['predicted_failure_prob'] = pred_df['p1']
-risky_cases = original_test[original_test['predicted_failure_prob'] > 0.1]
+risky_cases = original_test[original_test['predicted_failure_prob'] > 0.85]
 
 if risky_cases.empty:
     print("No high risk scenario found!")
